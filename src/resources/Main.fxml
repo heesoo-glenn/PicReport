@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
+
+<AnchorPane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Pane prefHeight="600.0" prefWidth="800.0">
+         <children>
+            <Pane prefHeight="140.0" prefWidth="800.0">
+               <children>
+                  <Pane prefHeight="89.0" prefWidth="800.0" style="-fx-border-color: #667399; -fx-background-color: #f0f0f5;">
+                     <children>
+                        <Button fx:id="SetInputExcelButton" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" prefHeight="23.0" prefWidth="125.0" style="-fx-background-color: #b3b3cc; -fx-border-color: #52527a;" text="엑셀 선택" textFill="#3d3d5c" />
+                        <Label fx:id="ExcelPathLabel" layoutX="148.0" layoutY="18.0" prefHeight="15.0" prefWidth="619.0" text="선택된 엑셀 파일이 없습니다." />
+                        <Label layoutX="14.0" layoutY="60.0" text="위치컬럼" />
+                        <Label layoutX="115.0" layoutY="60.0" text="내용 컬럼" />
+                        <Label layoutX="220.0" layoutY="60.0" text="사진번호 컬럼" />
+                        <TextField fx:id="PositionColumnTextField" layoutX="70.0" layoutY="56.0" prefHeight="23.0" prefWidth="35.0" text="E" />
+                        <TextField fx:id="ContentColumnTextField" layoutX="175.0" layoutY="56.0" prefHeight="23.0" prefWidth="35.0" text="G" />
+                        <TextField fx:id="PictureNoColumnTextField" layoutX="304.0" layoutY="56.0" prefHeight="23.0" prefWidth="35.0" text="M" />
+                     </children>
+                  </Pane>
+                  <Pane layoutY="88.0" prefHeight="52.0" prefWidth="800.0" style="-fx-border-color: #667399; -fx-background-color: #f0f0f5;">
+                     <children>
+                        <Button fx:id="SetPicDirButton" layoutX="14.0" layoutY="15.0" mnemonicParsing="false" prefHeight="23.0" prefWidth="125.0" style="-fx-background-color: #b3b3cc; -fx-border-color: #52527a;" text="그림파일 폴더 선택" textFill="#3d3d5c" />
+                        <Label fx:id="PicDirPathLabel" layoutX="150.0" layoutY="19.0" prefHeight="15.0" prefWidth="619.0" text="선택된 폴더가 없습니다." />
+                     </children>
+                  </Pane>
+               </children>
+            </Pane>
+            <Pane layoutY="139.0" prefHeight="397.0" prefWidth="800.0" style="-fx-border-color: #667399; -fx-background-color: #f0f0f5;">
+               <children>
+                  <Button fx:id="PreviewButton" layoutX="13.0" layoutY="10.0" mnemonicParsing="false" prefHeight="23.0" prefWidth="125.0" style="-fx-background-color: #b3b3cc; -fx-border-color: #52527a;" text="미리보기" textFill="#3d3d5c" />
+                  <TableView fx:id = "PreviewTableView" layoutX="14.0" layoutY="46.0" prefHeight="324.0" prefWidth="768.0">
+                    <columns>
+                      <TableColumn prefWidth="289.0" text="위치" />
+                      <TableColumn prefWidth="269.0" text="내용" />
+                      <TableColumn prefWidth="77.0" text="사진번호" />
+                      <TableColumn prefWidth="132.0" text="사진파일" />
+                    </columns>
+                  </TableView>
+               </children></Pane>
+            <Pane layoutY="535.0" prefHeight="65.0" prefWidth="800.0" style="-fx-background-color: #f0f0f5; -fx-border-color: #667399;">
+            	<children>
+            		<Button fx:id="ExecuteButton" layoutX="14.0" layoutY="19.0" mnemonicParsing="false" prefHeight="23.0" prefWidth="125.0" style="-fx-background-color: #b3b3cc; -fx-border-color: #52527a;" text="생성" textFill="#3d3d5c" />
+            	</children>
+            </Pane>
+         </children>
+      </Pane>
+   </children>
+</AnchorPane>
