@@ -2,9 +2,7 @@ package application;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -31,6 +29,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.util.IOUtils;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class Excel {
 	
@@ -274,11 +273,19 @@ public class Excel {
         File file = inputExcel;
 
         // 엑셀 파일 오픈
-        HSSFWorkbook wb;
+        Workbook wb;
 
         try {
-			wb = new HSSFWorkbook(new FileInputStream(file));
-		
+			String fileName = inputExcel.getName();
+			int lastDot = fileName.lastIndexOf('.');
+			String extension = fileName.substring(lastDot+1);
+			
+			if(extension.equals("xls")){
+				wb = new HSSFWorkbook(new FileInputStream(file));
+			}else{
+				wb = new XSSFWorkbook(new FileInputStream(file));
+			}
+			
 			 Cell cell = null;
 			 String cellValue3 = "";   
 			 // 첫번재 sheet 내용 읽기
@@ -363,4 +370,27 @@ public class Excel {
 	public void setInputExcel(File inputExcel) {
 		this.inputExcel = inputExcel;
 	}
+	
+	//excelRead() 다음에 실행해야 한다.
+	public void createPivotTableOn(HSSFWorkbook workbook){
+		HSSFSheet pivotSheet = workbook.createSheet("pivotSheet");
+		//XSSF 밖에 Pivot Table 생성을 지원하지 않는다 ...
+		//XSSFSheet sheet = my_xlsx_workbook.getSheetAt(0); 
+        /* Get the reference for Pivot Data */
+        //AreaReference a=new AreaReference("A1:C51");
+        /* Find out where the Pivot Table needs to be placed */
+        //CellReference b=new CellReference("I5");
+        /* Create Pivot Table */
+        //XSSFPivotTable pivotTable = sheet.createPivotTable(a,b);
+        /* Add filters */
+        //pivotTable.addReportFilter(0);
+        //pivotTable.addRowLabel(1);
+        //pivotTable.addColumnLabel(DataConsolidateFunction.SUM, 2); 
+        /* Write Pivot Table to File */
+		//List<String> data = this.read_data;
+		
+		
+		
+	}
+	
 }

@@ -109,6 +109,9 @@ public class Main extends Application {
 				excel.excelRead(positionColNo, pictureNoColNo, contentColNo, inExcel);
 				List<String> read_data = (List<String>) excel.getRead_data();
 				
+				//if(inExcel.getName().)
+				
+				
 				TableView tv = (TableView) mainFXMLNamespace.get("PreviewTableView");
 				ObservableList<TableColumn> colLi = tv.getColumns();
 
