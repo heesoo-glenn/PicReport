@@ -31,32 +31,32 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.util.IOUtils;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-public class Excel {
+public class ExcelReportHSSF implements ExcelReport{
 	
 	static HSSFRow row;
 	static HSSFCell cell;
 	
-	private List read_data;
+	//private List read_data;
 	private File inputExcel;
 	
+	private List<DmgStateAndPicture> dmgStateAndPictures;
+
 	//엑셀파일 생성
 	public void execute(File pictureDir, File outputDir){
-		
-		
-		List read_data = this.read_data;
-		
+
+		List<DmgStateAndPicture> dmgStateAndPictures = this.dmgStateAndPictures;
+		if(dmgStateAndPictures == null ){ /* validation : readExcel을 먼저해야함*/}
+
 		HSSFWorkbook workbook = new HSSFWorkbook();
 		HSSFSheet sheet = workbook.createSheet("sheet1");
 
-		//인쇄용지 설정
-		sheet.getPrintSetup().setPaperSize(PrintSetup.A4_PAPERSIZE);
+		sheet.getPrintSetup().setPaperSize(PrintSetup.A4_PAPERSIZE); //인쇄용지 설정
 
-		Header pageHeader = sheet.getHeader();
+		Header pageHeader = sheet.getHeader();	//머릿말
 		pageHeader.setCenter(HSSFHeader.font("휴먼옛체", "Normal") +
                 HSSFHeader.fontSize((short) 26) + "사 진 대 지");
 		
 		int st_pic = 0;
-		
 		try {
             //출력 row 생성
 			row = sheet.createRow(0);			
@@ -121,27 +121,24 @@ public class Excel {
 			//컬럼 페이지 설정
 			//sheet.setColumnBreak(2);
 			int rowcount = 9;
-            for (int i = 0; i < read_data.size(); i++) {				
+            for (int i = 0; i < dmgStateAndPictures.size(); i++) {				
 				//로우 페이지 설정
 				sheet.setRowBreak(rowcount);
 				rowcount =  rowcount + 10;
-				String data = (String)read_data.get(i);
-				String[] data_row = data.split(",");		
+				DmgStateAndPicture dmgStatePic = (DmgStateAndPicture)dmgStateAndPictures.get(i);
+				String picFileNameInExcel = dmgStatePic.getPictureFileNameInExcel();		
+				String position = dmgStatePic.getPosition();
+				String content = dmgStatePic.getContent();
 				
 				String basePath = pictureDir.getPath();
-				File test1Picture = new File(basePath+"\\"+data_row[1]+".jpg");			// 파일정보
-				InputStream test1Stream = new FileInputStream(test1Picture); 	// InputStream에 파일 set		*FileNotFoundException -> try catch 있어야됨
-				byte[] bytes = IOUtils.toByteArray(test1Stream);				// 이미지 binary를 byte 배열에 담음
+				File pictureFile = new File(basePath+"\\"+picFileNameInExcel+".jpg");			// 파일정보
+				InputStream pictureFIS = new FileInputStream(pictureFile); 	// InputStream에 파일 set		*FileNotFoundException -> try catch 있어야됨
+				byte[] bytes = IOUtils.toByteArray(pictureFIS);				// 이미지 binary를 byte 배열에 담음
 				
 	
 				HSSFPatriarch drawing = sheet.createDrawingPatriarch();	//그림 컨테이너, 그림을 실제로 insert하는 놈
-				
 				ClientAnchor anchor = new HSSFClientAnchor();	// 그림을 넣을 좌표를 지정하기 위한 객체
-				
-				/*
-					col1, row1은 그림의 좌측상단, col2, row2는 그림의 좌측하단
-					엑셀의 격자를 좌측상단부터의 좌표평면이라 생각하면 깔끔
-				*/
+
 				row = sheet.createRow(st_pic);
 				row.setHeight((short)500);
 				
@@ -195,7 +192,7 @@ public class Excel {
 						cells1.setCellValue("위  치");
 						cells1.setCellStyle(textheader_style);
 					}else if(j == 2){
-						cells1.setCellValue(data_row[2]);
+						cells1.setCellValue(position);
 						cells1.setCellStyle(text_style);
 					}else{
 						cells1.setCellStyle(text_style);
@@ -225,7 +222,7 @@ public class Excel {
 						cells1.setCellValue("내  용");
 						cells1.setCellStyle(textheader_style);
 					}else if(j == 2){
-						cells1.setCellValue(data_row[0]);
+						cells1.setCellValue(content);
 						cells1.setCellStyle(text_style);
 					}else{
 						cells1.setCellStyle(text_style);
@@ -247,8 +244,7 @@ public class Excel {
 
 				st_pic = st_pic+1;				
             }
-			
-            
+
             File outputExcelFile = new File(outputDir.getPath() + "\\" + "사진대지.xls");
 			FileOutputStream out = new FileOutputStream(outputExcelFile);
 			workbook.write(out);
@@ -258,21 +254,16 @@ public class Excel {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
-		
+
 	}
 
 	//엑셀 읽기 열번호 1,2,3 입력필요
 	@SuppressWarnings("deprecation")
-	public void excelRead(int column_num1, int column_num2,int column_num3, File  inputExcel) {
+	public void readExcel(int contentColNo, int pictureNoColNo,int positionColNo, File  inputExcel) {
+		//readExcel(contentColNo, pictureNoColNo, positionColNo, inExcel)
+		List<DmgStateAndPicture> dmgStateAndPictures = new ArrayList<DmgStateAndPicture>();
 
-		List<String> data_row = new ArrayList<String>();
-		
-		// 엑셀파일
         File file = inputExcel;
-
-        // 엑셀 파일 오픈
         Workbook wb;
 
         try {
@@ -292,34 +283,34 @@ public class Excel {
 			 for (Row row : wb.getSheetAt(0)) {
 
 				 //셀 읽기 
-				 String cellValue = excel_cellData(row.getCell(column_num1));
-				 String cellValue2 = excel_cellData(row.getCell(column_num2));
-				 
-				 String cellValue_tmp = excel_cellData(row.getCell((column_num3)-3));
+				 String cellValue = readCellAsString(row.getCell(contentColNo));
+				 String cellValue2 = readCellAsString(row.getCell(pictureNoColNo));
+				 String cellValue_tmp = readCellAsString(row.getCell((positionColNo)-3));
 				 
 				 String celldata1 = cellValue.replaceAll("\\p{Z}", "");
 				 String celldata2 = cellValue2.replaceAll("\\p{Z}", "");
 				 String celldata_tmp = cellValue_tmp.replaceAll("\\p{Z}", "");
 				 if(celldata_tmp.startsWith("구간")){
-					 cellValue3 = excel_cellData(row.getCell((column_num3)-1));;
+					 cellValue3 = readCellAsString(row.getCell((positionColNo)-1));;
 				 }
 				 
 				 if(!celldata1.equalsIgnoreCase("null") && !celldata1.equalsIgnoreCase("") && !celldata1.startsWith("결함") &&
 					!celldata2.equalsIgnoreCase("null") && !celldata2.equalsIgnoreCase("") && !celldata2.startsWith("사진") ){
-					 data_row.add(cellValue+","+cellValue2+","+ cellValue3);				 
+					 dmgStateAndPictures.add(new DmgStateAndPicture(cellValue3, cellValue, cellValue2));	
+					 //cellValue = 내용, cellValue2 = picNO?, cellValue3 = 위치
+					 //(String position, String content, String pictureFileNameInExcel)
 				 }
 			 }
 		}catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
         
-        this.read_data = data_row;
+        this.dmgStateAndPictures = dmgStateAndPictures;
 		return;       
 	}
 	
 	//셀 데이터 형식을 확인하고 내용을 string 형으로 변환함. 
-	public String excel_cellData(Cell cell) {
+	private String readCellAsString(Cell cell) {
 		 String valueStr = "";
 		 
 		 if(cell != null){
@@ -355,14 +346,14 @@ public class Excel {
 		return valueStr;		
 	}
 
-	public List getRead_data() {
-		return read_data;
+	
+	@Override
+	public List<DmgStateAndPicture> getPictureList() {
+		return dmgStateAndPictures;
 	}
 
-	public void setRead_data(List read_data) {
-		this.read_data = read_data;
-	}
-
+	
+	
 	public File getInputExcel() {
 		return inputExcel;
 	}
@@ -370,27 +361,15 @@ public class Excel {
 	public void setInputExcel(File inputExcel) {
 		this.inputExcel = inputExcel;
 	}
-	
-	//excelRead() 다음에 실행해야 한다.
-	public void createPivotTableOn(HSSFWorkbook workbook){
-		HSSFSheet pivotSheet = workbook.createSheet("pivotSheet");
-		//XSSF 밖에 Pivot Table 생성을 지원하지 않는다 ...
-		//XSSFSheet sheet = my_xlsx_workbook.getSheetAt(0); 
-        /* Get the reference for Pivot Data */
-        //AreaReference a=new AreaReference("A1:C51");
-        /* Find out where the Pivot Table needs to be placed */
-        //CellReference b=new CellReference("I5");
-        /* Create Pivot Table */
-        //XSSFPivotTable pivotTable = sheet.createPivotTable(a,b);
-        /* Add filters */
-        //pivotTable.addReportFilter(0);
-        //pivotTable.addRowLabel(1);
-        //pivotTable.addColumnLabel(DataConsolidateFunction.SUM, 2); 
-        /* Write Pivot Table to File */
-		//List<String> data = this.read_data;
-		
-		
-		
+
+
+	public List<DmgStateAndPicture> getDmgStateAndPictures() {
+		return dmgStateAndPictures;
 	}
+
+	public void setDmgStateAndPictures(List<DmgStateAndPicture> dmgStateAndPictures) {
+		this.dmgStateAndPictures = dmgStateAndPictures;
+	}
+
 	
 }

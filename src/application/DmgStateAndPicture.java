@@ -2,14 +2,14 @@ package application;
 
 import java.io.File;
 
-public class FormedPicture {
+public class DmgStateAndPicture {
 	private String position;
 	private String content;
 	private String pictureFileNameInExcel;
 	private File pictureFile;
 	
 	
-	public FormedPicture(String position, String content, String pictureFileNameInExcel){
+	public DmgStateAndPicture(String position, String content, String pictureFileNameInExcel){
 		this.position = position;
 		this.content = content;
 		this.pictureFileNameInExcel = pictureFileNameInExcel;

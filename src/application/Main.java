@@ -50,7 +50,7 @@ public class Main extends Application {
 			ObservableMap<String, Object> mainFXMLNamespace =  loader.getNamespace();
 			Scene scene = new Scene(loader.load());
 			
-			Excel excel = new Excel();
+			ExcelReportHSSF excel = new ExcelReportHSSF();
 			Util util = new Util();
 			
 			//엑셀선택 버튼 START
@@ -102,12 +102,11 @@ public class Main extends Application {
 				String pictureNoColumn_ =  ( (TextField) mainFXMLNamespace.get("PictureNoColumnTextField") ).getText();
 				
 				int positionColNo = util.decodeToDecimal(positionColumn_);
-				int pictureNoColNo = util.decodeToDecimal(pictureNoColumn_);
 				int contentColNo = util.decodeToDecimal(contentColumn_);
+				int pictureNoColNo = util.decodeToDecimal(pictureNoColumn_);
 
-
-				excel.excelRead(positionColNo, pictureNoColNo, contentColNo, inExcel);
-				List<String> read_data = (List<String>) excel.getRead_data();
+				excel.readExcel(contentColNo, pictureNoColNo, positionColNo, inExcel);
+				List<DmgStateAndPicture> dmgStatPictures = excel.getDmgStateAndPictures();
 				
 				//if(inExcel.getName().)
 				
@@ -119,14 +118,17 @@ public class Main extends Application {
 				TableColumn contentCol = colLi.get(1);	//사진번호 : 1
 				TableColumn pictureNoCol = colLi.get(2);
 				TableColumn pictureFile = colLi.get(3);
-				positionCol.setCellValueFactory(new PropertyValueFactory<TempData,String>("position"));
-				pictureNoCol.setCellValueFactory(new PropertyValueFactory<TempData,String>("pictureNo"));
-				contentCol.setCellValueFactory(new PropertyValueFactory<TempData,String>("content"));
-				pictureFile.setCellValueFactory(new PropertyValueFactory<TempData,String>("pictureFile"));
+				positionCol.setCellValueFactory(new PropertyValueFactory<DmgStateAndPicture,String>("position"));
+				pictureNoCol.setCellValueFactory(new PropertyValueFactory<DmgStateAndPicture,String>("pictureFileNameInExcel"));
+				contentCol.setCellValueFactory(new PropertyValueFactory<DmgStateAndPicture,String>("content"));
+				pictureFile.setCellValueFactory(new PropertyValueFactory<DmgStateAndPicture,String>("pictureFile"));
 				
-				ObservableList<TempData> dataList = FXCollections.observableArrayList();
-				for(String rowData  : read_data){
-					dataList.add(new TempData(rowData,"미구현"));
+				ObservableList<DmgStateAndPicture> dataList = FXCollections.observableArrayList();
+				for(DmgStateAndPicture dmgStatPic  : dmgStatPictures){
+					System.out.println("position : " + dmgStatPic.getPosition());
+					System.out.println("picNO : "+ dmgStatPic.getPictureFileNameInExcel());
+					System.out.println("content : " + dmgStatPic.getContent());
+					dataList.add(new DmgStateAndPicture(dmgStatPic.getPosition(), dmgStatPic.getContent(), dmgStatPic.getPictureFileNameInExcel()));
 				}
 				
 				tv.setItems(dataList);
@@ -157,7 +159,7 @@ public class Main extends Application {
 				
 				if(outputDir == null ) {return;}
 
-				if(excel.getRead_data() == null ) {
+				if(excel.getDmgStateAndPictures() == null ) {
 					//엑셀 컬럼알파벳을 번호로 변환
 					String positionColumn_ =  ( (TextField) mainFXMLNamespace.get("PositionColumnTextField") ).getText();
 					String contentColumn_ =  ( (TextField) mainFXMLNamespace.get("ContentColumnTextField") ).getText();
@@ -166,7 +168,8 @@ public class Main extends Application {
 					int pictureNoColNo = util.decodeToDecimal(pictureNoColumn_);
 					int contentColNo = util.decodeToDecimal(contentColumn_);
 
-					excel.excelRead(positionColNo, pictureNoColNo, contentColNo, inExcel); 
+					excel.readExcel(contentColNo, pictureNoColNo, positionColNo, inExcel);
+					
 				}
 				excel.execute(inPictureDir, outputDir);
 

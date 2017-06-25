@@ -21,8 +21,8 @@
                         <Label layoutX="14.0" layoutY="60.0" text="위치컬럼" />
                         <Label layoutX="115.0" layoutY="60.0" text="내용 컬럼" />
                         <Label layoutX="220.0" layoutY="60.0" text="사진번호 컬럼" />
-                        <TextField fx:id="PositionColumnTextField" layoutX="70.0" layoutY="56.0" prefHeight="23.0" prefWidth="35.0" text="E" />
-                        <TextField fx:id="ContentColumnTextField" layoutX="175.0" layoutY="56.0" prefHeight="23.0" prefWidth="35.0" text="G" />
+                        <TextField fx:id="PositionColumnTextField" layoutX="70.0" layoutY="56.0" prefHeight="23.0" prefWidth="35.0" text="G" />
+                        <TextField fx:id="ContentColumnTextField" layoutX="175.0" layoutY="56.0" prefHeight="23.0" prefWidth="35.0" text="E" />
                         <TextField fx:id="PictureNoColumnTextField" layoutX="304.0" layoutY="56.0" prefHeight="23.0" prefWidth="35.0" text="M" />
                      </children>
                   </Pane>
