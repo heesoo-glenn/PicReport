@@ -1,12 +1,11 @@
 package application;
  
 import java.io.File;
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
-
-//xls 파일 출력시 선언
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFRow;
+import java.util.Map.Entry;
 
 /* //xlsx 파일 출력시 선언
 import org.apache.poi.xssf.usermodel.XSSFCell;
@@ -17,7 +16,6 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
  
  
 import javafx.application.Application;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
@@ -31,7 +29,6 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.AnchorPane;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -107,13 +104,14 @@ public class Main extends Application {
 
 				excel.readExcel(contentColNo, pictureNoColNo, positionColNo, inExcel);
 				List<DmgStateAndPicture> dmgStatPictures = excel.getDmgStateAndPictures();
+
 				
-				//if(inExcel.getName().)
-				
+				checkPictureFileIsExists(dmgStatPictures); /*실제로 그림파일 폴더에 해당하는 파일명의 그림파일이 있는지 확인한다. 해당 파일의 fullname을 갖고온다.*/
+				HashMap<String, List<DmgStateAndPicture>> dupObjs = getDSPsDuplicatedOnPictureNumber(dmgStatPictures); 
 				
 				TableView tv = (TableView) mainFXMLNamespace.get("PreviewTableView");
+				
 				ObservableList<TableColumn> colLi = tv.getColumns();
-
 				TableColumn positionCol = colLi.get(0);	// 위치 : 0
 				TableColumn contentCol = colLi.get(1);	//사진번호 : 1
 				TableColumn pictureNoCol = colLi.get(2);
@@ -122,13 +120,9 @@ public class Main extends Application {
 				pictureNoCol.setCellValueFactory(new PropertyValueFactory<DmgStateAndPicture,String>("pictureFileNameInExcel"));
 				contentCol.setCellValueFactory(new PropertyValueFactory<DmgStateAndPicture,String>("content"));
 				pictureFile.setCellValueFactory(new PropertyValueFactory<DmgStateAndPicture,String>("pictureFile"));
-				
 				ObservableList<DmgStateAndPicture> dataList = FXCollections.observableArrayList();
 				for(DmgStateAndPicture dmgStatPic  : dmgStatPictures){
-					System.out.println("position : " + dmgStatPic.getPosition());
-					System.out.println("picNO : "+ dmgStatPic.getPictureFileNameInExcel());
-					System.out.println("content : " + dmgStatPic.getContent());
-					dataList.add(new DmgStateAndPicture(dmgStatPic.getPosition(), dmgStatPic.getContent(), dmgStatPic.getPictureFileNameInExcel()));
+					dataList.add(dmgStatPic);
 				}
 				
 				tv.setItems(dataList);
@@ -193,10 +187,66 @@ public class Main extends Application {
 	}
 	
 
+	private void checkPictureFileIsExists(List<DmgStateAndPicture> dmgStateAndPictures){
+		if( inPictureDir == null ) return;
+
+		HashMap<String, File> fullFileNames = new HashMap<String,File>();
+		File[] filesInPictureDir = inPictureDir.listFiles();
+
+		if(filesInPictureDir != null){
+			for(File pictureFile :  filesInPictureDir){
+				String fullFileName = pictureFile.getName();
+				int lastDot = fullFileName.lastIndexOf('.');
+				String nameWithoutExtension = fullFileName.substring(0,lastDot);
+				fullFileNames.put(nameWithoutExtension, pictureFile);
+			}
+		}
+
+		for(DmgStateAndPicture dmgStatPic : dmgStateAndPictures){
+			File picFile = fullFileNames.get(dmgStatPic.getPictureFileNameInExcel());
+			if(  picFile != null  ){
+				dmgStatPic.setPictureFile(picFile);
+			}
+		}
+		return;
+	}
+	
+	private HashMap<String, List<DmgStateAndPicture>> getDSPsDuplicatedOnPictureNumber(List<DmgStateAndPicture> dmgStateAndPictures){
+		HashMap<String, List<DmgStateAndPicture>> duplicationObjs = new HashMap<String, List<DmgStateAndPicture>>();
+		for(DmgStateAndPicture dsp :dmgStateAndPictures){
+			List<DmgStateAndPicture> dspByPFileName = duplicationObjs.get(dsp.getPictureFileNameInExcel());
+			if(dspByPFileName == null){
+				List<DmgStateAndPicture> addingElm = new ArrayList<DmgStateAndPicture>();
+				addingElm.add(dsp);
+				duplicationObjs.put(dsp.getPictureFileNameInExcel(), addingElm);
+			}else{
+				List<DmgStateAndPicture> storedElm = duplicationObjs.get(dsp.getPictureFileNameInExcel());
+				storedElm.add(dsp);
+			}
+		}
+		
+		Iterator<Entry<String, List<DmgStateAndPicture>>>  iter = duplicationObjs.entrySet().iterator();
+		
+		while(iter.hasNext()){
+			Entry<String, List<DmgStateAndPicture>> elm = iter.next();
+			System.out.println("--"+elm.getKey()+"--");
+			List<DmgStateAndPicture> elmVal = elm.getValue();
+			for(DmgStateAndPicture dsp : elmVal){
+				System.out.print(" position : " + dsp.getPosition());
+				System.out.print(", content : " + dsp.getContent());
+				System.out.println(", fileName : " + dsp.getPictureFileNameInExcel());
+				
+			}
+			
+		}
+		
+		
+		
+		return duplicationObjs;
+	}
 	
 	
 	public static void main(String[] args) {
 		launch(args);
-
 	}
 }

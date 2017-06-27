@@ -346,14 +346,7 @@ public class ExcelReportHSSF implements ExcelReport{
 		return valueStr;		
 	}
 
-	
-	@Override
-	public List<DmgStateAndPicture> getPictureList() {
-		return dmgStateAndPictures;
-	}
 
-	
-	
 	public File getInputExcel() {
 		return inputExcel;
 	}
@@ -361,7 +354,6 @@ public class ExcelReportHSSF implements ExcelReport{
 	public void setInputExcel(File inputExcel) {
 		this.inputExcel = inputExcel;
 	}
-
 
 	public List<DmgStateAndPicture> getDmgStateAndPictures() {
 		return dmgStateAndPictures;
