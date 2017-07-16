@@ -25,9 +25,11 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -47,7 +49,7 @@ public class Main extends Application {
 			ObservableMap<String, Object> mainFXMLNamespace =  loader.getNamespace();
 			Scene scene = new Scene(loader.load());
 			
-			ExcelReportHSSF excel = new ExcelReportHSSF();
+			ExcelReport excel = new ExcelReportHSSF();
 			Util util = new Util();
 			
 			//¿¢¼¿¼±ÅÃ ¹öÆ° START
@@ -152,8 +154,20 @@ public class Main extends Application {
 				File outputDir = dirChooser.showDialog(primaryStage);
 				
 				if(outputDir == null ) {return;}
+				
+				ToggleGroup outputTypeToggleGroup = (ToggleGroup)mainFXMLNamespace.get("OutputTypeToggleGroup");
+				RadioButton selectedRB = (RadioButton) outputTypeToggleGroup.getSelectedToggle();
+				String selectedOutputType = selectedRB.getUserData().toString(); //xls  ¶Ç´Â xlsx
+				
+				ExcelReport outExcel = null;
+				if(selectedOutputType.equals("xls")){
+					outExcel = excel;
+				}else{
+					outExcel = new ExcelReportXSSF();
+					outExcel.setDmgStateAndPictures(excel.getDmgStateAndPictures());
+				}
 
-				if(excel.getDmgStateAndPictures() == null ) {
+				if(outExcel.getDmgStateAndPictures() == null ) {
 					//¿¢¼¿ ÄÃ·³¾ËÆÄºªÀ» ¹øÈ£·Î º¯È¯
 					String positionColumn_ =  ( (TextField) mainFXMLNamespace.get("PositionColumnTextField") ).getText();
 					String contentColumn_ =  ( (TextField) mainFXMLNamespace.get("ContentColumnTextField") ).getText();
@@ -162,10 +176,10 @@ public class Main extends Application {
 					int pictureNoColNo = util.decodeToDecimal(pictureNoColumn_);
 					int contentColNo = util.decodeToDecimal(contentColumn_);
 
-					excel.readExcel(contentColNo, pictureNoColNo, positionColNo, inExcel);
+					outExcel.readExcel(contentColNo, pictureNoColNo, positionColNo, inExcel);
 					
 				}
-				excel.execute(inPictureDir, outputDir);
+				outExcel.execute(inPictureDir, outputDir);
 
 				executeButton.setStyle("-fx-background-color: #b3b3cc; -fx-border-color: #52527a;");
 			});
