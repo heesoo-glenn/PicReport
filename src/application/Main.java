@@ -1,20 +1,18 @@
 package application;
  
 import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map.Entry;
-
 /* //xlsx 파일 출력시 선언
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 */
- 
- 
+
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -35,7 +33,8 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
- 
+import javafx.concurrent.Task;; 
+
 public class Main extends Application {
 	
 	static File inExcel;	// 입력 엑셀
@@ -49,7 +48,7 @@ public class Main extends Application {
 			ObservableMap<String, Object> mainFXMLNamespace =  loader.getNamespace();
 			Scene scene = new Scene(loader.load());
 			
-			ExcelReport excel = new ExcelReportHSSF();
+			ExcelReport excel = new ExcelReportXSSF();
 			Util util = new Util();
 			
 			//엑셀선택 버튼 START
@@ -61,7 +60,7 @@ public class Main extends Application {
 				Label excelPathLabel = (Label)mainFXMLNamespace.get("ExcelPathLabel");
 				excelPathLabel.setText(inExcel.getAbsolutePath());
 				setExcelButton.setStyle("-fx-background-color: #b3b3cc; -fx-border-color: #52527a;");
-				return;
+				return;				
 			});
 			setExcelButton.setOnMouseEntered(e->{
 				setExcelButton.setStyle("-fx-background-color:#e6ccff; -fx-border-color:#52527a;");
@@ -105,28 +104,40 @@ public class Main extends Application {
 				int pictureNoColNo = util.decodeToDecimal(pictureNoColumn_);
 
 				excel.readExcel(contentColNo, pictureNoColNo, positionColNo, inExcel);
-				List<DmgStateAndPicture> dmgStatPictures = excel.getDmgStateAndPictures();
+				
+				List<Object> multSheets =  excel.getDmgStateAndPictures();
+				ObservableList<DmgStateAndPicture> dataList = FXCollections.observableArrayList();
 
-				
-				checkPictureFileIsExists(dmgStatPictures); /*실제로 그림파일 폴더에 해당하는 파일명의 그림파일이 있는지 확인한다. 해당 파일의 fullname을 갖고온다.*/
-				HashMap<String, List<DmgStateAndPicture>> dupObjs = getDSPsDuplicatedOnPictureNumber(dmgStatPictures); 
-				
 				TableView tv = (TableView) mainFXMLNamespace.get("PreviewTableView");
 				
 				ObservableList<TableColumn> colLi = tv.getColumns();
-				TableColumn positionCol = colLi.get(0);	// 위치 : 0
-				TableColumn contentCol = colLi.get(1);	//사진번호 : 1
-				TableColumn pictureNoCol = colLi.get(2);
-				TableColumn pictureFile = colLi.get(3);
-				positionCol.setCellValueFactory(new PropertyValueFactory<DmgStateAndPicture,String>("position"));
-				pictureNoCol.setCellValueFactory(new PropertyValueFactory<DmgStateAndPicture,String>("pictureFileNameInExcel"));
-				contentCol.setCellValueFactory(new PropertyValueFactory<DmgStateAndPicture,String>("content"));
-				pictureFile.setCellValueFactory(new PropertyValueFactory<DmgStateAndPicture,String>("pictureFile"));
-				ObservableList<DmgStateAndPicture> dataList = FXCollections.observableArrayList();
-				for(DmgStateAndPicture dmgStatPic  : dmgStatPictures){
-					dataList.add(dmgStatPic);
-				}
 				
+				TableColumn sheetCol = colLi.get(0);
+				TableColumn positionCol = colLi.get(1);	// 위치 : 0
+				TableColumn contentCol = colLi.get(2);	//사진번호 : 1
+				TableColumn pictureNoCol = colLi.get(3);
+				TableColumn pictureFile = colLi.get(4);
+
+			
+				for (int i = 0; i < multSheets.size(); i++) {
+					
+					Object sheets = multSheets.get(i);
+					List<DmgStateAndPicture> dmgStateAndPictureSheet = (List<DmgStateAndPicture>) sheets;
+
+					checkPictureFileIsExists(dmgStateAndPictureSheet); // 실제로 그림파일 폴더에 해당하는 파일명의 그림파일이 있는지 확인한다. 해당 파일의 fullname을 갖고온다.
+					HashMap<String, List<DmgStateAndPicture>> dupObjs = getDSPsDuplicatedOnPictureNumber(dmgStateAndPictureSheet,Integer.toString(i+1)); 
+					
+					
+					sheetCol.setCellValueFactory(new PropertyValueFactory<DmgStateAndPicture,String>("sheetnum"));
+					positionCol.setCellValueFactory(new PropertyValueFactory<DmgStateAndPicture,String>("position"));
+					pictureNoCol.setCellValueFactory(new PropertyValueFactory<DmgStateAndPicture,String>("pictureFileNameInExcel"));
+					contentCol.setCellValueFactory(new PropertyValueFactory<DmgStateAndPicture,String>("content"));
+					pictureFile.setCellValueFactory(new PropertyValueFactory<DmgStateAndPicture,String>("pictureFile"));
+					for(DmgStateAndPicture dmgStatPic  : dmgStateAndPictureSheet){
+						dataList.add(dmgStatPic);
+					}
+					
+				}				
 				tv.setItems(dataList);
 				
 				previewButton.setStyle("-fx-background-color: #b3b3cc; -fx-border-color: #52527a;");
@@ -190,13 +201,59 @@ public class Main extends Application {
 				executeButton.setStyle("-fx-background-color: #b3b3cc; -fx-border-color: #52527a;");
 			});
 			//생성버튼 END
+			
+			Button pivotButton = (Button) mainFXMLNamespace.get("PivotButton");
+			pivotButton.setOnMouseClicked(e ->{
+				ExcelPivot pivot = new ExcelPivot();
+				try {
+					Alert alert = new Alert(AlertType.INFORMATION);
+					alert.setTitle("진행");
+					alert.setHeaderText(null);
+					alert.setContentText("출력 엑셀을 저장할 폴더를 선택해 주세요.");
+					alert.showAndWait();
 
+					DirectoryChooser dirChooser = new DirectoryChooser();
+					File outputDir = dirChooser.showDialog(primaryStage);
+
+					if(outputDir == null ) {return;}
+					
+					String pivot1Column_ =  ( (TextField) mainFXMLNamespace.get("Pivot1NoColumnTextField") ).getText();
+					String pivot2Column_ =  ( (TextField) mainFXMLNamespace.get("Pivot2NoColumnTextField") ).getText();
+
+					pivot.print_pivot(pivot1Column_,pivot2Column_,inExcel,outputDir);
+					
+					
+				} catch (Exception e2) {
+					// TODO: handle exception
+				}
+				
+				pivotButton.setStyle("-fx-background-color: #b3b3cc; -fx-border-color: #52527a;");
+			});
+			pivotButton.setOnMouseEntered(e->{
+				pivotButton.setStyle("-fx-background-color:#e6ccff; -fx-border-color:#52527a;");
+			});
+			pivotButton.setOnMouseExited(e ->{
+				pivotButton.setStyle("-fx-background-color: #b3b3cc; -fx-border-color: #52527a;");
+			});
+			//생성버튼 END
 			primaryStage.setTitle("사진대지 생성");
 			primaryStage.initStyle(StageStyle.UTILITY);
 			primaryStage.setScene(scene);
 			primaryStage.show();
+			
+			 
 		} catch(Exception e) {
-			e.printStackTrace();
+			StringWriter sw = new StringWriter();
+			e.printStackTrace(new PrintWriter(sw));
+			String exceptionAsString = sw.toString();
+
+			ExceptionCheck exx = new ExceptionCheck();
+			try {
+				exx.ExceptionCall(exceptionAsString);
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 		}
 	}
 	
@@ -225,20 +282,22 @@ public class Main extends Application {
 		return;
 	}
 	
-	private HashMap<String, List<DmgStateAndPicture>> getDSPsDuplicatedOnPictureNumber(List<DmgStateAndPicture> dmgStateAndPictures){
+	private HashMap<String, List<DmgStateAndPicture>> getDSPsDuplicatedOnPictureNumber(List<DmgStateAndPicture> dmgStateAndPictures,String sheetnum){
 		HashMap<String, List<DmgStateAndPicture>> duplicationObjs = new HashMap<String, List<DmgStateAndPicture>>();
 		for(DmgStateAndPicture dsp :dmgStateAndPictures){
 			List<DmgStateAndPicture> dspByPFileName = duplicationObjs.get(dsp.getPictureFileNameInExcel());
 			if(dspByPFileName == null){
+				dsp.setSheetnum(sheetnum);
 				List<DmgStateAndPicture> addingElm = new ArrayList<DmgStateAndPicture>();
 				addingElm.add(dsp);
 				duplicationObjs.put(dsp.getPictureFileNameInExcel(), addingElm);
 			}else{
+				dsp.setSheetnum(sheetnum);
 				List<DmgStateAndPicture> storedElm = duplicationObjs.get(dsp.getPictureFileNameInExcel());
 				storedElm.add(dsp);
 			}
 		}
-		
+/*		
 		Iterator<Entry<String, List<DmgStateAndPicture>>>  iter = duplicationObjs.entrySet().iterator();
 		
 		while(iter.hasNext()){
@@ -253,14 +312,12 @@ public class Main extends Application {
 			}
 			
 		}
-		
-		
-		
+*/		
+			
 		return duplicationObjs;
 	}
-	
-	
+		 
 	public static void main(String[] args) {
 		launch(args);
-	}
+	}	
 }

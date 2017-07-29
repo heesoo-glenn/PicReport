@@ -7,16 +7,45 @@ public class DmgStateAndPicture {
 	private String content;
 	private String pictureFileNameInExcel;
 	private File pictureFile;
+	private String supply;
+	private String unit;
+	private String ea;
+	private String sheetnum;//시트넘버 쓰려고 추가한거
 	
-	
-	public DmgStateAndPicture(String position, String content, String pictureFileNameInExcel){
+	public DmgStateAndPicture(String position, String content, String pictureFileNameInExcel, String supply, String unit, String ea){
 		this.position = position;
 		this.content = content;
 		this.pictureFileNameInExcel = pictureFileNameInExcel;
+		this.supply = supply;
+		this.unit = unit;
+		this.ea = ea;
+	}	
+	
+	
+	public String getSheetnum() {
+		return sheetnum;
 	}
-	
-	
-	
+	public void setSheetnum(String sheetnum) {
+		this.sheetnum = sheetnum;
+	}
+	public String getEa() {
+		return ea;
+	}
+	public void setEa(String ea) {
+		this.ea = ea;
+	}
+	public String getSupply() {
+		return supply;
+	}
+	public void setSupply(String supply) {
+		this.supply = supply;
+	}
+	public String getUnit() {
+		return unit;
+	}
+	public void setUnit(String unit) {
+		this.unit = unit;
+	}
 	public String getPosition() {
 		return position;
 	}

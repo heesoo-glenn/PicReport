@@ -23,9 +23,14 @@
                         <Label layoutX="14.0" layoutY="60.0" text="위치컬럼" />
                         <Label layoutX="115.0" layoutY="60.0" text="내용 컬럼" />
                         <Label layoutX="220.0" layoutY="60.0" text="사진번호 컬럼" />
+                        <Label layoutX="355.0" layoutY="60.0" text="피벗컬럼1" />
+                        <Label layoutX="475.0" layoutY="60.0" text="피벗컬럼2" />
                         <TextField fx:id="PositionColumnTextField" layoutX="70.0" layoutY="56.0" prefHeight="23.0" prefWidth="35.0" text="G" />
                         <TextField fx:id="ContentColumnTextField" layoutX="175.0" layoutY="56.0" prefHeight="23.0" prefWidth="35.0" text="E" />
                         <TextField fx:id="PictureNoColumnTextField" layoutX="304.0" layoutY="56.0" prefHeight="23.0" prefWidth="35.0" text="M" />
+                        <TextField fx:id="Pivot1NoColumnTextField" layoutX="420.0" layoutY="56.0" prefHeight="23.0" prefWidth="45.0" text="A6" />
+                        <TextField fx:id="Pivot2NoColumnTextField" layoutX="535.0" layoutY="56.0" prefHeight="23.0" prefWidth="70.0" text="L526" />
+                        
                      </children>
                   </Pane>
                   <Pane layoutY="88.0" prefHeight="52.0" prefWidth="800.0" style="-fx-border-color: #667399; -fx-background-color: #f0f0f5;">
@@ -41,7 +46,8 @@
                   <Button fx:id="PreviewButton" layoutX="13.0" layoutY="10.0" mnemonicParsing="false" prefHeight="23.0" prefWidth="125.0" style="-fx-background-color: #b3b3cc; -fx-border-color: #52527a;" text="미리보기" textFill="#3d3d5c" />
                   <TableView fx:id="PreviewTableView" layoutX="14.0" layoutY="46.0" prefHeight="324.0" prefWidth="768.0">
                     <columns>
-                      <TableColumn prefWidth="289.0" text="위치" />
+                      <TableColumn prefWidth="77" text="시트번호" />
+                      <TableColumn prefWidth="212.0" text="위치" />
                       <TableColumn prefWidth="269.0" text="내용" />
                       <TableColumn prefWidth="77.0" text="사진번호" />
                       <TableColumn prefWidth="132.0" text="사진파일" />
@@ -50,13 +56,15 @@
                </children></Pane>
             <Pane layoutY="535.0" prefHeight="112.0" prefWidth="800.0" style="-fx-background-color: #f0f0f5; -fx-border-color: #667399;">
             	<children>
-            		<Button fx:id="ExecuteButton" layoutX="15.0" layoutY="66.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="183.0" style="-fx-background-color: #b3b3cc; -fx-border-color: #52527a;" text="생성" textFill="#3d3d5c" />
-                  <RadioButton layoutX="14.0" layoutY="36.0" mnemonicParsing="false" selected="true" text=".xls(엑셀97-2003)" userData="xls">
+            		<Button fx:id="ExecuteButton" layoutX="15.0" layoutY="66.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="183.0" style="-fx-background-color: #b3b3cc; -fx-border-color: #52527a;" text="사진생성" textFill="#3d3d5c" />
+            		<Button fx:id="PivotButton" layoutX="215.0" layoutY="66.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="183.0" style="-fx-background-color: #b3b3cc; -fx-border-color: #52527a;" text="피벗생성" textFill="#3d3d5c" />
+            		
+                 	<RadioButton layoutX="14.0" layoutY="36.0" mnemonicParsing="false" selected="false" text=".xls(엑셀97-2003)" userData="xls">
                      <toggleGroup>
                         <ToggleGroup fx:id="OutputTypeToggleGroup" />
                      </toggleGroup>
                   </RadioButton>
-                  <RadioButton layoutX="164.0" layoutY="36.0" mnemonicParsing="false" text=".xlsx (2004 ~ , 피벗 테이블 포함)" userData="xlsx" toggleGroup="$OutputTypeToggleGroup" />
+                  <RadioButton layoutX="164.0" layoutY="36.0" mnemonicParsing="false" selected="true" text=".xlsx (2004 ~ , 피벗 테이블 포함)" userData="xlsx" toggleGroup="$OutputTypeToggleGroup" />
                   <Label layoutX="14.0" layoutY="14.0" text="출력파일 형식 선택" />
             	</children>
             </Pane>
