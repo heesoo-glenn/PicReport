@@ -10,22 +10,24 @@ public class DmgStateAndPicture {
 	private String supply;
 	private String unit;
 	private String ea;
-	private String sheetnum;//시트넘버 쓰려고 추가한거
+	private int sheetnum;//시트넘버 쓰려고 추가한거
 	
-	public DmgStateAndPicture(String position, String content, String pictureFileNameInExcel, String supply, String unit, String ea){
+	public DmgStateAndPicture(String position, String content, String pictureFileNameInExcel, String supply, String unit, String ea,int sheetnum){
 		this.position = position;
 		this.content = content;
 		this.pictureFileNameInExcel = pictureFileNameInExcel;
 		this.supply = supply;
 		this.unit = unit;
 		this.ea = ea;
+		this.sheetnum = sheetnum;
 	}	
 	
 	
-	public String getSheetnum() {
+	
+	public int getSheetnum() {
 		return sheetnum;
 	}
-	public void setSheetnum(String sheetnum) {
+	public void setSheetnum(int sheetnum) {
 		this.sheetnum = sheetnum;
 	}
 	public String getEa() {

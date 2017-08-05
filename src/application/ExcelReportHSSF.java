@@ -37,9 +37,9 @@ import org.apache.poi.xssf.usermodel.XSSFPicture;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-public class ExcelReportHSSF implements ExcelReport{
+public class ExcelReportHSSF{
 	
-	static HSSFRow row;
+	/*tatic HSSFRow row;
 	static HSSFCell cell;
 	
 	private File inputExcel;
@@ -406,5 +406,5 @@ public class ExcelReportHSSF implements ExcelReport{
 		
 	}
 
-	
+	*/
 }
