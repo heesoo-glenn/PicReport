@@ -56,15 +56,16 @@
                </children></Pane>
             <Pane layoutY="535.0" prefHeight="112.0" prefWidth="800.0" style="-fx-background-color: #f0f0f5; -fx-border-color: #667399;">
             	<children>
-            		<Button fx:id="ExecuteButton" layoutX="15.0" layoutY="66.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="183.0" style="-fx-background-color: #b3b3cc; -fx-border-color: #52527a;" text="사진생성" textFill="#3d3d5c" />
-            		<Button fx:id="PivotButton" layoutX="215.0" layoutY="66.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="183.0" style="-fx-background-color: #b3b3cc; -fx-border-color: #52527a;" text="피벗생성" textFill="#3d3d5c" />
+            		<Button fx:id="ExecuteButton" layoutX="15.0" layoutY="66.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="183.0" style="-fx-background-color: #b3b3cc; -fx-border-color: #52527a;" text="파일생성" textFill="#3d3d5c" />
             		
-                 	<RadioButton layoutX="14.0" layoutY="36.0" mnemonicParsing="false" selected="false" text=".xls(엑셀97-2003)" userData="xls">
+                 	<RadioButton layoutX="14.0" layoutY="36.0" mnemonicParsing="false" selected="false" text="1열" userData="1">
                      <toggleGroup>
                         <ToggleGroup fx:id="OutputTypeToggleGroup" />
                      </toggleGroup>
                   </RadioButton>
-                  <RadioButton layoutX="164.0" layoutY="36.0" mnemonicParsing="false" selected="true" text=".xlsx (2004 ~ , 피벗 테이블 포함)" userData="xlsx" toggleGroup="$OutputTypeToggleGroup" />
+                  <RadioButton layoutX="114.0" layoutY="36.0" mnemonicParsing="false" selected="true" text="2열" userData="2" toggleGroup="$OutputTypeToggleGroup" />
+                  <RadioButton layoutX="214.0" layoutY="36.0" mnemonicParsing="false" selected="true" text="3열" userData="3" toggleGroup="$OutputTypeToggleGroup" />
+                  <RadioButton layoutX="314.0" layoutY="36.0" mnemonicParsing="false" selected="true" text="4열" userData="4" toggleGroup="$OutputTypeToggleGroup" />           
                   <Label layoutX="14.0" layoutY="14.0" text="출력파일 형식 선택" />
             	</children>
             </Pane>

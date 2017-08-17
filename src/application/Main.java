@@ -43,7 +43,7 @@ public class Main extends Application {
 	static File inExcel;	// 입력 엑셀
 	static File inPictureDir;	// 입력 그림 폴더
 	static final String initialWorkingDir;	//현재 프로그램의 작업 디렉토리
-	
+	static boolean check_img = true; //사진 중복 체크용
 	static{
 		initialWorkingDir = System.getProperty("user.dir");
 	};
@@ -71,6 +71,7 @@ public class Main extends Application {
 				Label excelPathLabel = (Label)mainFXMLNamespace.get("ExcelPathLabel");
 				excelPathLabel.setText(inExcel.getAbsolutePath());
 				setExcelButton.setStyle("-fx-background-color: #b3b3cc; -fx-border-color: #52527a;");
+				check_img = true; // 사진 중복체크용
 				return;				
 			});
 			setExcelButton.setOnMouseEntered(e->{
@@ -106,6 +107,8 @@ public class Main extends Application {
 			previewButton.setOnMouseClicked(e ->{
 				previewButton.setStyle("-fx-background-color:#e6ccff; -fx-border-color:#52527a;");
 
+				check_img = true; // 사진 중복체크용
+				
 				List check_pic_num = new ArrayList<>();
 				
 				String positionColumn_ =  ( (TextField) mainFXMLNamespace.get("PositionColumnTextField") ).getText();
@@ -175,6 +178,7 @@ public class Main extends Application {
 						String check_number = dmgStatPic.getPictureFileNameInExcel().toString()+Integer.toString(dmgStatPic.getSheetnum());
 						if(check_pic_num.contains(check_number)){
 							dmgStatPic.setPictureFileNameInExcel("중복/"+dmgStatPic.getPictureFileNameInExcel().toString());
+							check_img = false; // 사진 중복체크용
 						}else{
 							check_pic_num.add(check_number);
 						}
@@ -196,61 +200,72 @@ public class Main extends Application {
 			//생성버튼 START
 			Button executeButton = (Button) mainFXMLNamespace.get("ExecuteButton");
 			executeButton.setOnMouseClicked(e ->{
-				
-				executeButton.setStyle("-fx-background-color:#e6ccff; -fx-border-color:#52527a;");
-				
-				Alert alert = new Alert(AlertType.INFORMATION);
-				alert.setTitle("진행");
-				alert.setHeaderText(null);
-				alert.setContentText("출력 엑셀을 저장할 폴더를 선택해 주세요.");
-				alert.showAndWait();
-
-				DirectoryChooser dirChooser = new DirectoryChooser();
-				File outputDir = dirChooser.showDialog(primaryStage);
-				
-				if(outputDir == null ) {return;}
-				
-				ToggleGroup outputTypeToggleGroup = (ToggleGroup)mainFXMLNamespace.get("OutputTypeToggleGroup");
-				RadioButton selectedRB = (RadioButton) outputTypeToggleGroup.getSelectedToggle();
-				String selectedPrintType =selectedRB.getUserData().toString(); //xls  또는 xlsx
-				String selectedOutputType = "xlsx";
-				
-				ExcelReport outExcel = null;
-				if(selectedOutputType.equals("xls")){
-					outExcel = excel;
-				}else{
-					outExcel = new ExcelReportXSSF();
-					outExcel.setDmgStateAndPictures(excel.getDmgStateAndPictures());
-				}
-				String pivot1Column_ = null;
-				String pivot2Column_ = null;
-				if(outExcel.getDmgStateAndPictures() == null ) {
-					//엑셀 컬럼알파벳을 번호로 변환
-					String positionColumn_ =  ( (TextField) mainFXMLNamespace.get("PositionColumnTextField") ).getText();
-					String contentColumn_ =  ( (TextField) mainFXMLNamespace.get("ContentColumnTextField") ).getText();
-					String pictureNoColumn_ =  ( (TextField) mainFXMLNamespace.get("PictureNoColumnTextField") ).getText();
-					pivot1Column_ =  ( (TextField) mainFXMLNamespace.get("Pivot1NoColumnTextField") ).getText();
-					pivot2Column_ =  ( (TextField) mainFXMLNamespace.get("Pivot2NoColumnTextField") ).getText();
-					int positionColNo = util.decodeToDecimal(positionColumn_);
-					int pictureNoColNo = util.decodeToDecimal(pictureNoColumn_);
-					int contentColNo = util.decodeToDecimal(contentColumn_);
-
-					outExcel.readExcel(contentColNo, pictureNoColNo, positionColNo, inExcel);
+				if(check_img){
+					executeButton.setStyle("-fx-background-color:#e6ccff; -fx-border-color:#52527a;");
 					
+					Alert alert = new Alert(AlertType.INFORMATION);
+					alert.setTitle("진행");
+					alert.setHeaderText(null);
+					alert.setContentText("출력 엑셀을 저장할 폴더를 선택해 주세요.");
+					alert.showAndWait();
+	
+					DirectoryChooser dirChooser = new DirectoryChooser();
+					File outputDir = dirChooser.showDialog(primaryStage);
+					
+					if(outputDir == null ) {return;}
+					
+					ToggleGroup outputTypeToggleGroup = (ToggleGroup)mainFXMLNamespace.get("OutputTypeToggleGroup");
+					RadioButton selectedRB = (RadioButton) outputTypeToggleGroup.getSelectedToggle();
+					String selectedPrintType =selectedRB.getUserData().toString(); //xls  또는 xlsx
+					String selectedOutputType = "xlsx";
+					
+					ExcelReport outExcel = null;
+					if(selectedOutputType.equals("xls")){
+						outExcel = excel;
+					}else{
+						outExcel = new ExcelReportXSSF();
+						outExcel.setDmgStateAndPictures(excel.getDmgStateAndPictures());
+					}
+					String pivot1Column_ = null;
+					String pivot2Column_ = null;
+					if(outExcel.getDmgStateAndPictures() == null ) {
+						//엑셀 컬럼알파벳을 번호로 변환
+						String positionColumn_ =  ( (TextField) mainFXMLNamespace.get("PositionColumnTextField") ).getText();
+						String contentColumn_ =  ( (TextField) mainFXMLNamespace.get("ContentColumnTextField") ).getText();
+						String pictureNoColumn_ =  ( (TextField) mainFXMLNamespace.get("PictureNoColumnTextField") ).getText();
+						pivot1Column_ =  ( (TextField) mainFXMLNamespace.get("Pivot1NoColumnTextField") ).getText();
+						pivot2Column_ =  ( (TextField) mainFXMLNamespace.get("Pivot2NoColumnTextField") ).getText();
+						int positionColNo = util.decodeToDecimal(positionColumn_);
+						int pictureNoColNo = util.decodeToDecimal(pictureNoColumn_);
+						int contentColNo = util.decodeToDecimal(contentColumn_);
+	
+						outExcel.readExcel(contentColNo, pictureNoColNo, positionColNo, inExcel);
+						
+					}else{
+						pivot1Column_ =  ( (TextField) mainFXMLNamespace.get("Pivot1NoColumnTextField") ).getText();
+						pivot2Column_ =  ( (TextField) mainFXMLNamespace.get("Pivot2NoColumnTextField") ).getText();
+					}
+					
+					//outExcel.execute(inPictureDir, outputDir,inExcel,pivot1Column_,pivot2Column_,selectedPrintType, progressEventHandler);
+					//새 스레드에서 작업을 실행하기 위해 변경
+					outExcel.setInfoBeforeExecution(inPictureDir, outputDir,inExcel,pivot1Column_,pivot2Column_,selectedPrintType, progressEventHandler);
+					Runnable runnableExcel = (Runnable) outExcel;
+					Thread executeThread = new Thread(runnableExcel);
+					executeThread.start();
+					
+	
+					executeButton.setStyle("-fx-background-color: #b3b3cc; -fx-border-color: #52527a;");
 				}else{
-					pivot1Column_ =  ( (TextField) mainFXMLNamespace.get("Pivot1NoColumnTextField") ).getText();
-					pivot2Column_ =  ( (TextField) mainFXMLNamespace.get("Pivot2NoColumnTextField") ).getText();
-				}
-				
-				//outExcel.execute(inPictureDir, outputDir,inExcel,pivot1Column_,pivot2Column_,selectedPrintType, progressEventHandler);
-				//새 스레드에서 작업을 실행하기 위해 변경
-				outExcel.setInfoBeforeExecution(inPictureDir, outputDir,inExcel,pivot1Column_,pivot2Column_,selectedPrintType, progressEventHandler);
-				Runnable runnableExcel = (Runnable) outExcel;
-				Thread executeThread = new Thread(runnableExcel);
-				executeThread.start();
-				
+					String exceptionAsString = "충복된 사진명을 수정해주세요";
 
-				executeButton.setStyle("-fx-background-color: #b3b3cc; -fx-border-color: #52527a;");
+					ExceptionCheck exx = new ExceptionCheck();
+					try {
+						exx.ExceptionCall(exceptionAsString);
+					} catch (Exception e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
 			});
 			executeButton.setOnMouseEntered(e->{
 				executeButton.setStyle("-fx-background-color:#e6ccff; -fx-border-color:#52527a;");
