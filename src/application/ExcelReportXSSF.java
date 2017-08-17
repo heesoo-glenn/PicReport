@@ -32,7 +32,6 @@ import javafx.stage.Stage;
 
 public class ExcelReportXSSF implements ExcelReport, Runnable{
 	
-	
 	private List<Object> multSheet;
 	
 	public void readExcel(int contentColNo, int pictureNoColNo,int positionColNo, File  inputExcel) {
@@ -121,7 +120,8 @@ public class ExcelReportXSSF implements ExcelReport, Runnable{
 	}
 	
 	@Override
-	public void execute(File pictureDir, File outputDir,File  inputExcel, String pivot1Column_, String pivot2Column_, String selectedPrintType, ProgressEventHandler progressEventHandler) {
+	public void execute(File pictureDir, File outputDir,File  inputExcel, String pivot1Column_, String pivot2Column_,int pictureNoColumn_,
+			String selectedPrintType, ProgressEventHandler progressEventHandler) {
 		//XSSFWorkbook workbook = new XSSFWorkbook();
 		List<Object> multSheet = this.multSheet;
 
@@ -150,10 +150,11 @@ public class ExcelReportXSSF implements ExcelReport, Runnable{
 				//사진대지
 				Header pageHeader = sheet.getHeader();	//머릿말
 				pageHeader.setCenter(HSSFHeader.font("휴먼옛체", "Normal") +HSSFHeader.fontSize((short) 26) + "사 진 대 지");
-				switch (selectedPrintType) {
-				case "1":
+				
+				switch (selectedPrintType) {//출력시 사진대지부분을 몃열로 출력할지 정하는부분
+				case "1": //1열
 					sheet.getPrintSetup().setPaperSize(PrintSetup.A4_PAPERSIZE);
-					image_make.make_1(pictureDir, workbook, sheet, sheets);
+					image_make.make_1(pictureDir, workbook, sheet, sheets, pictureNoColumn_);
 					
 					int data_st_pic1 = sheet.getLastRowNum();
 					
@@ -169,9 +170,9 @@ public class ExcelReportXSSF implements ExcelReport, Runnable{
 					sheet.setDisplayGridlines(true);
 				    sheet.setPrintGridlines(true);
 					break;
-				case "2":
+				case "2": //2열
 					sheet.getPrintSetup().setPaperSize(PrintSetup.A4_PAPERSIZE);
-					image_make.make_2(pictureDir, workbook, sheet, sheets);
+					image_make.make_2(pictureDir, workbook, sheet, sheets, pictureNoColumn_);
 					
 					int data_st_pic2 = sheet.getLastRowNum();	
 					int dats2 = workbook.getSheetIndex(sheet_name+"_사진");
@@ -187,9 +188,9 @@ public class ExcelReportXSSF implements ExcelReport, Runnable{
 				    sheet.setPrintGridlines(true);
 					
 					break;
-				case "3":
+				case "3": //3열
 					sheet.getPrintSetup().setPaperSize(PrintSetup.A3_PAPERSIZE);
-					image_make.make_3(pictureDir, workbook, sheet, sheets);
+					image_make.make_3(pictureDir, workbook, sheet, sheets, pictureNoColumn_);
 					
 					int data_st_pic3 = sheet.getLastRowNum();
 					int dats3 = workbook.getSheetIndex(sheet_name+"_사진");
@@ -205,9 +206,9 @@ public class ExcelReportXSSF implements ExcelReport, Runnable{
 				    sheet.setPrintGridlines(true);
 					
 					break;
-				case "4":
+				case "4": //4열
 					sheet.getPrintSetup().setPaperSize(PrintSetup.A3_PAPERSIZE);
-					image_make.make_4(pictureDir, workbook, sheet, sheets);	
+					image_make.make_4(pictureDir, workbook, sheet, sheets, pictureNoColumn_);	
 					
 					int data_st_pic4 = sheet.getLastRowNum();
 					int dats4 = workbook.getSheetIndex(sheet_name+"_사진");
@@ -320,7 +321,7 @@ public class ExcelReportXSSF implements ExcelReport, Runnable{
 	}
 	
 	private void runnableExecute(){
-		execute(this.pictureDir, this.outputDir,this.inputExcel, this.pivot1Column_, this.pivot2Column_, this.selectedPrintType, this.progressEventHandler);
+		execute(this.pictureDir, this.outputDir,this.inputExcel, this.pivot1Column_, this.pivot2Column_, this.pictureNoColumn_,this.selectedPrintType, this.progressEventHandler);
 	}
 
 	File pictureDir;
@@ -328,11 +329,12 @@ public class ExcelReportXSSF implements ExcelReport, Runnable{
 	File  inputExcel;
 	String pivot1Column_;
 	String pivot2Column_;
+	int pictureNoColumn_;	
 	String selectedPrintType;
 	ProgressEventHandler progressEventHandler;
 	
 	@Override
-	public void setInfoBeforeExecution(File pictureDir, File outputDir,File  inputExcel, String pivot1Column_, String pivot2Column_,
+	public void setInfoBeforeExecution(File pictureDir, File outputDir,File  inputExcel, String pivot1Column_, String pivot2Column_,int pictureNoColumn_,
 			String selectedPrintType, ProgressEventHandler progressEventHandler) {
 
 	this.pictureDir = pictureDir;
@@ -340,6 +342,7 @@ public class ExcelReportXSSF implements ExcelReport, Runnable{
 	this.inputExcel = inputExcel;
 	this.pivot1Column_ = pivot1Column_;
 	this.pivot2Column_ = pivot2Column_;
+	this.pictureNoColumn_ = pictureNoColumn_;
 	this.selectedPrintType = selectedPrintType;
 	this.progressEventHandler = progressEventHandler;
 	}

@@ -228,6 +228,7 @@ public class Main extends Application {
 					}
 					String pivot1Column_ = null;
 					String pivot2Column_ = null;
+					
 					if(outExcel.getDmgStateAndPictures() == null ) {
 						//엑셀 컬럼알파벳을 번호로 변환
 						String positionColumn_ =  ( (TextField) mainFXMLNamespace.get("PositionColumnTextField") ).getText();
@@ -245,10 +246,13 @@ public class Main extends Application {
 						pivot1Column_ =  ( (TextField) mainFXMLNamespace.get("Pivot1NoColumnTextField") ).getText();
 						pivot2Column_ =  ( (TextField) mainFXMLNamespace.get("Pivot2NoColumnTextField") ).getText();
 					}
-					
 					//outExcel.execute(inPictureDir, outputDir,inExcel,pivot1Column_,pivot2Column_,selectedPrintType, progressEventHandler);
+					String pictureNoColumn_ =  ( (TextField) mainFXMLNamespace.get("PictureNoColumnTextField") ).getText();
+					int pictureNoColNo = util.decodeToDecimal(pictureNoColumn_);
+					//자꾸 0이 나와서 변경한부분
+					
 					//새 스레드에서 작업을 실행하기 위해 변경
-					outExcel.setInfoBeforeExecution(inPictureDir, outputDir,inExcel,pivot1Column_,pivot2Column_,selectedPrintType, progressEventHandler);
+					outExcel.setInfoBeforeExecution(inPictureDir, outputDir,inExcel,pivot1Column_,pivot2Column_,pictureNoColNo,selectedPrintType, progressEventHandler);//하이퍼링크때문에 추
 					Runnable runnableExcel = (Runnable) outExcel;
 					Thread executeThread = new Thread(runnableExcel);
 					executeThread.start();
