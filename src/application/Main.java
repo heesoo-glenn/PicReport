@@ -69,6 +69,25 @@ public class Main extends Application {
 				FileChooser fileChooser = new FileChooser();
 				inExcel = (fileChooser.showOpenDialog(primaryStage));
 				Label excelPathLabel = (Label)mainFXMLNamespace.get("ExcelPathLabel");
+				
+				//xlsx파일만 선택하도록함.
+				String file_root = inExcel.getAbsolutePath();
+				String[] directoryName = file_root.split("\\\\"); 
+				String fileName = directoryName[directoryName.length -1];
+				if(inExcel != null){
+					if(!fileName.contains(".xlsx")){
+						ExceptionCheck exx = new ExceptionCheck();
+						try {
+							exx.ExceptionCall("xlsx확장자 파일만 변환이 가능합니다.\n 이외의 형식은 변환해서 넣어주시기 바랍니다.");
+							inExcel = null;
+							return;
+						} catch (Exception e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+					}
+				}
+				
 				excelPathLabel.setText(inExcel.getAbsolutePath());
 				setExcelButton.setStyle("-fx-background-color: #b3b3cc; -fx-border-color: #52527a;");
 				check_img = true; // 사진 중복체크용
