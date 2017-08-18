@@ -7,15 +7,8 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-/* //xlsx ÆÄÀÏ Ãâ·Â½Ã ¼±¾ğ
-import org.apache.poi.xssf.usermodel.XSSFCell;
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-*/
 
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
@@ -32,6 +25,9 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -40,10 +36,10 @@ import javafx.util.Callback;
 
 public class Main extends Application {
 	
-	static File inExcel;	// ÀÔ·Â ¿¢¼¿
-	static File inPictureDir;	// ÀÔ·Â ±×¸² Æú´õ
-	static final String initialWorkingDir;	//ÇöÀç ÇÁ·Î±×·¥ÀÇ ÀÛ¾÷ µğ·ºÅä¸®
-	static boolean check_img = true; //»çÁø Áßº¹ Ã¼Å©¿ë
+	static File inExcel;	// ì…ë ¥ ì—‘ì…€
+	static File inPictureDir;	// ì…ë ¥ ê·¸ë¦¼ í´ë”
+	static final String initialWorkingDir;	//í˜„ì¬ í”„ë¡œê·¸ë¨ì˜ ì‘ì—… ë””ë ‰í† ë¦¬
+	static boolean check_img = true; //ì‚¬ì§„ ì¤‘ë³µ ì²´í¬ìš©
 	static{
 		initialWorkingDir = System.getProperty("user.dir");
 	};
@@ -51,7 +47,6 @@ public class Main extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		try {
-			
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(getClass().getResource("/resources/Main.fxml"));
 			ObservableMap<String, Object> mainFXMLNamespace =  loader.getNamespace();
@@ -60,9 +55,9 @@ public class Main extends Application {
 			ExcelReport excel = new ExcelReportXSSF();
 			Util util = new Util();
 			
-			ProgressEventHandler progressEventHandler = createProgressEventHandler();//ÀÛ¾÷ÁøÇà ÆË¾÷ÀÇ ÀÌº¥Æ® ÇÚµé¸µ °´Ã¼ »ı¼º
+			ProgressEventHandler progressEventHandler = createProgressEventHandler();//ì‘ì—…ì§„í–‰ íŒì—…ì˜ ì´ë²¤íŠ¸ í•¸ë“¤ë§ ê°ì²´ ìƒì„±
 
-			//¿¢¼¿¼±ÅÃ ¹öÆ° START
+			//ì—‘ì…€ì„ íƒ ë²„íŠ¼ START
 			Button setExcelButton = (Button) mainFXMLNamespace.get("SetInputExcelButton");
 			setExcelButton.setOnMouseClicked(e -> {
 				setExcelButton.setStyle("-fx-background-color:#e6ccff; -fx-border-color:#52527a;");
@@ -70,7 +65,7 @@ public class Main extends Application {
 				inExcel = (fileChooser.showOpenDialog(primaryStage));
 				Label excelPathLabel = (Label)mainFXMLNamespace.get("ExcelPathLabel");
 				
-				//xlsxÆÄÀÏ¸¸ ¼±ÅÃÇÏµµ·ÏÇÔ.
+				//xlsxíŒŒì¼ë§Œ ì„ íƒí•˜ë„ë¡í•¨.
 				String file_root = inExcel.getAbsolutePath();
 				String[] directoryName = file_root.split("\\\\"); 
 				String fileName = directoryName[directoryName.length -1];
@@ -78,7 +73,7 @@ public class Main extends Application {
 					if(!fileName.contains(".xlsx")){
 						ExceptionCheck exx = new ExceptionCheck();
 						try {
-							exx.ExceptionCall("xlsxÈ®ÀåÀÚ ÆÄÀÏ¸¸ º¯È¯ÀÌ °¡´ÉÇÕ´Ï´Ù.\n ÀÌ¿ÜÀÇ Çü½ÄÀº º¯È¯ÇØ¼­ ³Ö¾îÁÖ½Ã±â ¹Ù¶ø´Ï´Ù.");
+							exx.ExceptionCall("xlsxí™•ì¥ì íŒŒì¼ë§Œ ë³€í™˜ì´ ê°€ëŠ¥í•©ë‹ˆë‹¤.\n ì´ì™¸ì˜ í˜•ì‹ì€ ë³€í™˜í•´ì„œ ë„£ì–´ì£¼ì‹œê¸° ë°”ëë‹ˆë‹¤.");
 							inExcel = null;
 							return;
 						} catch (Exception e1) {
@@ -90,7 +85,7 @@ public class Main extends Application {
 				
 				excelPathLabel.setText(inExcel.getAbsolutePath());
 				setExcelButton.setStyle("-fx-background-color: #b3b3cc; -fx-border-color: #52527a;");
-				check_img = true; // »çÁø Áßº¹Ã¼Å©¿ë
+				check_img = true; // ì‚¬ì§„ ì¤‘ë³µì²´í¬ìš©
 				return;				
 			});
 			setExcelButton.setOnMouseEntered(e->{
@@ -99,10 +94,10 @@ public class Main extends Application {
 			setExcelButton.setOnMouseExited(e ->{
 				setExcelButton.setStyle("-fx-background-color: #b3b3cc; -fx-border-color: #52527a;");
 			});
-			//¿¢¼¿¼±ÅÃ¹öÆ° END
+			//ì—‘ì…€ì„ íƒë²„íŠ¼ END
 			
 			
-			//±×¸²Æú´õ ¼±ÅÃ ¹öÆ° START
+			//ê·¸ë¦¼í´ë” ì„ íƒ ë²„íŠ¼ START
 			Button setPicDirButton = (Button) mainFXMLNamespace.get("SetPicDirButton");
 			setPicDirButton.setOnMouseClicked(e->{
 				setPicDirButton.setStyle("-fx-background-color:#e6ccff; -fx-border-color:#52527a;");
@@ -118,15 +113,15 @@ public class Main extends Application {
 			setPicDirButton.setOnMouseExited(e ->{
 				setPicDirButton.setStyle("-fx-background-color: #b3b3cc; -fx-border-color: #52527a;");
 			});
-			//±×¸²Æú´õ ¼±ÅÃ ¹öÆ° END
+			//ê·¸ë¦¼í´ë” ì„ íƒ ë²„íŠ¼ END
 			
 			
-			//¹Ì¸®º¸±â ¹öÆ° START
+			//ë¯¸ë¦¬ë³´ê¸° ë²„íŠ¼ START
 			Button previewButton = (Button) mainFXMLNamespace.get("PreviewButton");
 			previewButton.setOnMouseClicked(e ->{
 				previewButton.setStyle("-fx-background-color:#e6ccff; -fx-border-color:#52527a;");
 
-				check_img = true; // »çÁø Áßº¹Ã¼Å©¿ë
+				check_img = true; // ì‚¬ì§„ ì¤‘ë³µì²´í¬ìš©
 				
 				List check_pic_num = new ArrayList<>();
 				
@@ -149,8 +144,8 @@ public class Main extends Application {
 				ObservableList<TableColumn> colLi = tv.getColumns();
 				
 				TableColumn sheetCol = colLi.get(0);
-				TableColumn positionCol = colLi.get(1);	// À§Ä¡ : 0
-				TableColumn contentCol = colLi.get(2);	//»çÁø¹øÈ£ : 1
+				TableColumn positionCol = colLi.get(1);	// ìœ„ì¹˜ : 0
+				TableColumn contentCol = colLi.get(2);	//ì‚¬ì§„ë²ˆí˜¸ : 1
 				TableColumn pictureNoCol = colLi.get(3);
 				TableColumn pictureFile = colLi.get(4);
 
@@ -160,7 +155,7 @@ public class Main extends Application {
 					Object sheets = multSheets.get(i);
 					List<DmgStateAndPicture> dmgStateAndPictureSheet = (List<DmgStateAndPicture>) sheets;
 
-					checkPictureFileIsExists(dmgStateAndPictureSheet); // ½ÇÁ¦·Î ±×¸²ÆÄÀÏ Æú´õ¿¡ ÇØ´çÇÏ´Â ÆÄÀÏ¸íÀÇ ±×¸²ÆÄÀÏÀÌ ÀÖ´ÂÁö È®ÀÎÇÑ´Ù. ÇØ´ç ÆÄÀÏÀÇ fullnameÀ» °®°í¿Â´Ù.
+					checkPictureFileIsExists(dmgStateAndPictureSheet); // ì‹¤ì œë¡œ ê·¸ë¦¼íŒŒì¼ í´ë”ì— í•´ë‹¹í•˜ëŠ” íŒŒì¼ëª…ì˜ ê·¸ë¦¼íŒŒì¼ì´ ìˆëŠ”ì§€ í™•ì¸í•œë‹¤. í•´ë‹¹ íŒŒì¼ì˜ fullnameì„ ê°–ê³ ì˜¨ë‹¤.
 					HashMap<String, List<DmgStateAndPicture>> dupObjs = getDSPsDuplicatedOnPictureNumber(dmgStateAndPictureSheet); 
 					
 					sheetCol.setCellValueFactory(new PropertyValueFactory<DmgStateAndPicture,String>("sheetnum"));
@@ -178,7 +173,7 @@ public class Main extends Application {
 			                        super.updateItem(item, empty);//*don't forget!
 			                        if (item != null) {
 			                            setText(item);
-			                            if (item.startsWith("Áßº¹")) {
+			                            if (item.startsWith("ì¤‘ë³µ")) {
 			                                setStyle("-fx-background-color: red; -fx-text-fill: white;");
 			                            }else{
 			                            	setStyle("");
@@ -193,11 +188,11 @@ public class Main extends Application {
 
 					for(DmgStateAndPicture dmgStatPic  : dmgStateAndPictureSheet){
 						dataList.add(dmgStatPic);
-						//¼ıÀÚ Áßº¹ Ã¼Å©
+						//ìˆ«ì ì¤‘ë³µ ì²´í¬
 						String check_number = dmgStatPic.getPictureFileNameInExcel().toString()+Integer.toString(dmgStatPic.getSheetnum());
 						if(check_pic_num.contains(check_number)){
-							dmgStatPic.setPictureFileNameInExcel("Áßº¹/"+dmgStatPic.getPictureFileNameInExcel().toString());
-							check_img = false; // »çÁø Áßº¹Ã¼Å©¿ë
+							dmgStatPic.setPictureFileNameInExcel("ì¤‘ë³µ/"+dmgStatPic.getPictureFileNameInExcel().toString());
+							check_img = false; // ì‚¬ì§„ ì¤‘ë³µì²´í¬ìš©
 						}else{
 							check_pic_num.add(check_number);
 						}
@@ -214,18 +209,18 @@ public class Main extends Application {
 			previewButton.setOnMouseExited(e ->{
 				previewButton.setStyle("-fx-background-color: #b3b3cc; -fx-border-color: #52527a;");
 			});
-			//¹Ì¸®º¸±â ¹öÆ° END
+			//ë¯¸ë¦¬ë³´ê¸° ë²„íŠ¼ END
 			
-			//»ı¼º¹öÆ° START
+			//ìƒì„±ë²„íŠ¼ START
 			Button executeButton = (Button) mainFXMLNamespace.get("ExecuteButton");
 			executeButton.setOnMouseClicked(e ->{
 				if(check_img){
 					executeButton.setStyle("-fx-background-color:#e6ccff; -fx-border-color:#52527a;");
 					
 					Alert alert = new Alert(AlertType.INFORMATION);
-					alert.setTitle("ÁøÇà");
+					alert.setTitle("ì§„í–‰");
 					alert.setHeaderText(null);
-					alert.setContentText("Ãâ·Â ¿¢¼¿À» ÀúÀåÇÒ Æú´õ¸¦ ¼±ÅÃÇØ ÁÖ¼¼¿ä.");
+					alert.setContentText("ì¶œë ¥ ì—‘ì…€ì„ ì €ì¥í•  í´ë”ë¥¼ ì„ íƒí•´ ì£¼ì„¸ìš”.");
 					alert.showAndWait();
 	
 					DirectoryChooser dirChooser = new DirectoryChooser();
@@ -235,7 +230,7 @@ public class Main extends Application {
 					
 					ToggleGroup outputTypeToggleGroup = (ToggleGroup)mainFXMLNamespace.get("OutputTypeToggleGroup");
 					RadioButton selectedRB = (RadioButton) outputTypeToggleGroup.getSelectedToggle();
-					String selectedPrintType =selectedRB.getUserData().toString(); //xls  ¶Ç´Â xlsx
+					String selectedPrintType =selectedRB.getUserData().toString(); //xls  ë˜ëŠ” xlsx
 					String selectedOutputType = "xlsx";
 					
 					ExcelReport outExcel = null;
@@ -249,7 +244,7 @@ public class Main extends Application {
 					String pivot2Column_ = null;
 					
 					if(outExcel.getDmgStateAndPictures() == null ) {
-						//¿¢¼¿ ÄÃ·³¾ËÆÄºªÀ» ¹øÈ£·Î º¯È¯
+						//ì—‘ì…€ ì»¬ëŸ¼ì•ŒíŒŒë²³ì„ ë²ˆí˜¸ë¡œ ë³€í™˜
 						String positionColumn_ =  ( (TextField) mainFXMLNamespace.get("PositionColumnTextField") ).getText();
 						String contentColumn_ =  ( (TextField) mainFXMLNamespace.get("ContentColumnTextField") ).getText();
 						String pictureNoColumn_ =  ( (TextField) mainFXMLNamespace.get("PictureNoColumnTextField") ).getText();
@@ -268,10 +263,10 @@ public class Main extends Application {
 					//outExcel.execute(inPictureDir, outputDir,inExcel,pivot1Column_,pivot2Column_,selectedPrintType, progressEventHandler);
 					String pictureNoColumn_ =  ( (TextField) mainFXMLNamespace.get("PictureNoColumnTextField") ).getText();
 					int pictureNoColNo = util.decodeToDecimal(pictureNoColumn_);
-					//ÀÚ²Ù 0ÀÌ ³ª¿Í¼­ º¯°æÇÑºÎºĞ
+					//ìê¾¸ 0ì´ ë‚˜ì™€ì„œ ë³€ê²½í•œë¶€ë¶„
 					
-					//»õ ½º·¹µå¿¡¼­ ÀÛ¾÷À» ½ÇÇàÇÏ±â À§ÇØ º¯°æ
-					outExcel.setInfoBeforeExecution(inPictureDir, outputDir,inExcel,pivot1Column_,pivot2Column_,pictureNoColNo,selectedPrintType, progressEventHandler);//ÇÏÀÌÆÛ¸µÅ©¶§¹®¿¡ Ãß
+					//ìƒˆ ìŠ¤ë ˆë“œì—ì„œ ì‘ì—…ì„ ì‹¤í–‰í•˜ê¸° ìœ„í•´ ë³€ê²½
+					outExcel.setInfoBeforeExecution(inPictureDir, outputDir,inExcel,pivot1Column_,pivot2Column_,pictureNoColNo,selectedPrintType, progressEventHandler);//í•˜ì´í¼ë§í¬ë•Œë¬¸ì— ì¶”
 					Runnable runnableExcel = (Runnable) outExcel;
 					Thread executeThread = new Thread(runnableExcel);
 					executeThread.start();
@@ -279,7 +274,7 @@ public class Main extends Application {
 	
 					executeButton.setStyle("-fx-background-color: #b3b3cc; -fx-border-color: #52527a;");
 				}else{
-					String exceptionAsString = "Ãæº¹µÈ »çÁø¸íÀ» ¼öÁ¤ÇØÁÖ¼¼¿ä";
+					String exceptionAsString = "ì¶©ë³µëœ ì‚¬ì§„ëª…ì„ ìˆ˜ì •í•´ì£¼ì„¸ìš”";
 
 					ExceptionCheck exx = new ExceptionCheck();
 					try {
@@ -296,14 +291,27 @@ public class Main extends Application {
 			executeButton.setOnMouseExited(e ->{
 				executeButton.setStyle("-fx-background-color: #b3b3cc; -fx-border-color: #52527a;");
 			});
-			//»ı¼º¹öÆ° END
+			//ìƒì„±ë²„íŠ¼ END
 	
-			primaryStage.setTitle("»çÁø´ëÁö »ı¼º");
+			primaryStage.setTitle("ì‚¬ì§„ëŒ€ì§€ ìƒì„±");
 			primaryStage.initStyle(StageStyle.UTILITY);
 			primaryStage.setScene(scene);
 			primaryStage.show();
 			
-			 
+			//ì¶”ê°€íŒì—…ì°½
+			Stage popupStage = new Stage();
+	        VBox box = new VBox();
+
+		    Scene popup_scene = new Scene(box);
+		    
+		    Image main_image = new Image(getClass().getResourceAsStream("/image/mainimage.jpg"));
+	        ImageView view_image = new ImageView(main_image);
+		    
+	        box.getChildren().add(0,view_image);
+			
+	        popupStage.setTitle("ë¬¸ì˜ì •ë³´");
+	        popupStage.setScene(popup_scene);
+	        popupStage.show();	
 		} catch(Exception e) {
 			StringWriter sw = new StringWriter();
 			e.printStackTrace(new PrintWriter(sw));
@@ -391,7 +399,7 @@ public class Main extends Application {
 
 		ProgressEventHandler progressEventHandler = new ProgressEventHandler(primaryStage, scene, progressFXMLNamespace);
 		primaryStage.setScene(scene);
-	    primaryStage.setTitle("ÀÛ¾÷ÀÌ ÁøÇàÁßÀÔ´Ï´Ù.");
+	    primaryStage.setTitle("ì‘ì—…ì´ ì§„í–‰ì¤‘ì…ë‹ˆë‹¤.");
 
 		return (ProgressEventHandler) progressEventHandler;
 	}
